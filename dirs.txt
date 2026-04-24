@@ -1,0 +1,6 @@
+﻿C:\Program Files\Android\Android Studio\bin
+C:\Program Files\Android\Android Studio\jbr
+C:\Program Files\Android\Android Studio\lib
+C:\Program Files\Android\Android Studio\license
+C:\Program Files\Android\Android Studio\modules
+C:\Program Files\Android\Android Studio\plugins

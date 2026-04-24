@@ -1,0 +1,81 @@
+// Sakti Armor – Firestore Security Rules (draft)
+// Deploy: firebase deploy --only firestore:rules
+// 
+// Structure:
+//   users/{uid} – profile (role, name, bloodGroup, etc.)
+//   users/{uid}/guardians/{guardianId} – linked guardians
+//   alerts/{alertId} – alert doc (userId, status, lat, lng, etc.)
+//   alerts/{alertId}/locationHistory/{doc}
+//   alerts/{alertId}/messages/{doc}
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: guardian can read alert if they are in the user's guardians list
+    function isGuardianOf(alertUserId) {
+      return exists(/databases/$(database)/documents/users/$(alertUserId)/guardians/$(request.auth.uid));
+    }
+
+    // ---- Users: only own document ----
+    // User can read/write only their own profile.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ---- Guardians subcollection: only owner ----
+    // User can read/write their own guardians list.
+    match /users/{userId}/guardians/{guardianId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ---- Alerts: owner (user) can full access; guardians can read linked user's alerts ----
+    // Creator (userId on document) can read/write/update.
+    // Guardian access: would require checking if request.auth.uid is in users/{alertUserId}/guardians (server-side or via custom claims). For simplicity we allow read if authenticated; restrict in app or use Cloud Function for guardian checks.
+    match /alerts/{alertId} {
+      allow read: if request.auth != null
+        && (resource == null || resource.data.userId == request.auth.uid
+            || isGuardianOf(resource.data.userId));
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null
+        && (resource.data.userId == request.auth.uid || isGuardianOf(resource.data.userId));
+    }
+
+    // ---- Audio clips (evidence during SOS) ----
+    match /alerts/{alertId}/audioClips/{clipId} {
+      allow read: if request.auth != null
+        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
+            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
+      allow create: if request.auth != null
+        && get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ---- Location history: only alert owner or linked guardian ----
+    match /alerts/{alertId}/locationHistory/{docId} {
+      allow read: if request.auth != null
+        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
+            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
+      allow create: if request.auth != null
+        && get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ---- Messages: only participants (alert owner or guardian) ----
+    match /alerts/{alertId}/messages/{docId} {
+      allow read: if request.auth != null
+        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
+            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
+      allow create: if request.auth != null
+        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
+            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
+      allow update, delete: if false;
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

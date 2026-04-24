@@ -1,0 +1,227 @@
+﻿Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:generateDebugBuildConfig
+> Task :app:checkDebugAarMetadata
+> Task :app:generateDebugResValues
+> Task :app:injectCrashlyticsMappingFileIdDebug
+> Task :app:processDebugGoogleServices
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeDebugJniLibFolders
+> Task :app:checkDebugDuplicateClasses
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:processDebugManifestForPackage
+> Task :app:mergeExtDexDebug
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:mergeLibDexDebug
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:processDebugResources
+> Task :app:kspDebugKotlin
+
+> Task :app:compileDebugKotlin FAILED
+.\gradlew.bat : e: file:/
+//C:/Users/Tarun/OneDrive
+%20-%20MITADTU/Desktop/AL
+TU%20FALTU%20CHIZE/Sakti%
+20Armor/app/src/main/java
+/com/example/saktiarmor/u
+i/navigation/SaktiNavGrap
+h.kt:238:58 Overload 
+resolution ambiguity: 
+At line:1 char:1
++ .\gradlew.bat 
+assembleDebug 2>&1 | 
+Out-File -FilePath 
+build_result2.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
+    + CategoryInfo       
+       : NotSpe    
+cified: (e: file    
+:///C:/U...ion a    
+mbiguity: :Strin    g) 
+[], RemoteExc    eption
+    + FullyQualified    
+ErrorId : Native    
+CommandError
+ 
+public fun InvalidAlertPl
+aceholder(navController: 
+NavController, 
+screenLabel: String): 
+Unit defined in com.examp
+le.saktiarmor.ui.screen 
+in file MapScreen.kt
+public fun InvalidAlertPl
+aceholder(navController: 
+NavController, source: 
+String): Unit defined in 
+com.example.saktiarmor.ui
+.screen in file 
+HomeScreen.kt
+e: file:///C:/Users/Tarun
+/OneDrive%20-%20MITADTU/D
+esktop/ALTU%20FALTU%20CHI
+ZE/Sakti%20Armor/app/src/
+main/java/com/example/sak
+tiarmor/ui/navigation/Sak
+tiNavGraph.kt:249:58 
+Overload resolution 
+ambiguity: 
+public fun InvalidAlertPl
+aceholder(navController: 
+NavController, 
+screenLabel: String): 
+Unit defined in com.examp
+le.saktiarmor.ui.screen 
+in file MapScreen.kt
+public fun InvalidAlertPl
+aceholder(navController: 
+NavController, source: 
+String): Unit defined in 
+com.example.saktiarmor.ui
+.screen in file 
+HomeScreen.kt
+e: file:///C:/Users/Tarun
+/OneDrive%20-%20MITADTU/D
+esktop/ALTU%20FALTU%20CHI
+ZE/Sakti%20Armor/app/src/
+main/java/com/example/sak
+tiarmor/ui/screen/Dashboa
+rdScreen.kt:319:56 
+Unresolved reference: 
+HeartRedPale
+e: file:///C:/Users/Tarun
+/OneDrive%20-%20MITADTU/D
+esktop/ALTU%20FALTU%20CHI
+ZE/Sakti%20Armor/app/src/
+main/java/com/example/sak
+tiarmor/ui/screen/Dashboa
+rdScreen.kt:437:50 
+Unresolved reference: 
+OxygenPale
+e: file:///C:/Users/Tarun
+/OneDrive%20-%20MITADTU/D
+esktop/ALTU%20FALTU%20CHI
+ZE/Sakti%20Armor/app/src/
+main/java/com/example/sak
+tiarmor/ui/screen/HomeScr
+een.kt:1125:1 
+Conflicting overloads: 
+public fun InvalidAlertPl
+aceholder(navController: 
+NavController, source: 
+String): Unit defined in 
+com.example.saktiarmor.ui
+.screen in file 
+HomeScreen.kt, public 
+fun InvalidAlertPlacehold
+er(navController: 
+NavController, 
+screenLabel: String): 
+Unit defined in com.examp
+le.saktiarmor.ui.screen 
+in file MapScreen.kt
+e: file:///C:/Users/Tarun
+/OneDrive%20-%20MITADTU/D
+esktop/ALTU%20FALTU%20CHI
+ZE/Sakti%20Armor/app/src/
+main/java/com/example/sak
+tiarmor/ui/screen/MapScre
+en.kt:106:9 Overload 
+resolution ambiguity: 
+public fun InvalidAlertPl
+aceholder(navController: 
+NavController, 
+screenLabel: String): 
+Unit defined in com.examp
+le.saktiarmor.ui.screen 
+in file MapScreen.kt
+public fun InvalidAlertPl
+aceholder(navController: 
+NavController, source: 
+String): Unit defined in 
+com.example.saktiarmor.ui
+.screen in file 
+HomeScreen.kt
+e: file:///C:/Users/Tarun
+/OneDrive%20-%20MITADTU/D
+esktop/ALTU%20FALTU%20CHI
+ZE/Sakti%20Armor/app/src/
+main/java/com/example/sak
+tiarmor/ui/screen/MapScre
+en.kt:415:1 Conflicting 
+overloads: public fun Inv
+alidAlertPlaceholder(navC
+ontroller: 
+NavController, source: 
+String): Unit defined in 
+com.example.saktiarmor.ui
+.screen in file 
+HomeScreen.kt, public 
+fun InvalidAlertPlacehold
+er(navController: 
+NavController, 
+screenLabel: String): 
+Unit defined in com.examp
+le.saktiarmor.ui.screen 
+in file MapScreen.kt
+e: file:///C:/Users/Tarun
+/OneDrive%20-%20MITADTU/D
+esktop/ALTU%20FALTU%20CHI
+ZE/Sakti%20Armor/app/src/
+main/java/com/example/sak
+tiarmor/ui/screen/VoiceSc
+reen.kt:182:60 
+Unresolved reference: 
+HeartRedPale
+
+FAILURE: Build failed 
+with an exception.
+
+* What went wrong:
+Execution failed for 
+task ':app:compileDebugKo
+tlin'.
+> A failure occurred 
+while executing org.jetbr
+ains.kotlin.compilerRunne
+r.GradleCompilerRunnerWit
+hWorkers$GradleKotlinComp
+ilerWorkAction
+   > Compilation error. 
+See log for more details
+
+* Try:
+> Run with --stacktrace 
+option to get the stack 
+trace.
+> Run with --info or 
+--debug option to get 
+more log output.
+> Run with --scan to get 
+full insights.
+> Get more help at 
+https://help.gradle.org.
+
+BUILD FAILED in 5m 56s
+30 actionable tasks: 30 executed

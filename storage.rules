@@ -1,0 +1,20 @@
+// Sakti Armor – Firebase Storage Security Rules
+// Deploy: firebase deploy --only storage
+//
+// Path: emergency_audio/{alertId}/{timestamp}.aac
+// Only the user who owns the alert (creator) may upload. Guardians may read.
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /emergency_audio/{alertId}/{filename} {
+      // Allow read if user is authenticated (app will restrict to alert participants via Firestore)
+      allow read: if request.auth != null;
+      // Allow create only for authenticated users (alert ownership checked in app / via custom claims if needed)
+      allow create: if request.auth != null
+        && request.resource.size < 50 * 1024 * 1024  // 50 MB max per file
+        && request.resource.contentType.matches('audio/.*');
+      allow update, delete: if false;
+    }
+  }
+}

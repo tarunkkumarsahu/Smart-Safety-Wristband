@@ -1,0 +1,27 @@
+﻿java.exe : openjdk 
+version "21.0.8" 
+2025-07-15
+At line:1 char:1
++ & "C:\Program 
+Files\Android\Android 
+Studio\jbr\bin\java.exe" 
+-version ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo       
+       : NotSpecified:   
+  (openjdk version "21   
+ .0.8" 2025-07-15:Str    
+ing) [], RemoteExcep    
+tion
+    + FullyQualifiedErro 
+   rId : NativeCommandE  
+  rror
+ 
+OpenJDK Runtime 
+Environment (build 21.0.8
++-14196175-b1038.72)
+OpenJDK 64-Bit Server VM 
+(build 21.0.8+-14196175-b
+1038.72, mixed mode)
