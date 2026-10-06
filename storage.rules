@@ -1,20 +1,50 @@
-// Sakti Armor – Firebase Storage Security Rules
-// Deploy: firebase deploy --only storage
+// Sakti Armor — Firebase Storage Security Rules
+// Deploy with: firebase deploy --only storage
 //
-// Path: emergency_audio/{alertId}/{timestamp}.aac
-// Only the user who owns the alert (creator) may upload. Guardians may read.
+// emergency_audio/{alertId}/{filename}
+// - alert owner may upload audio evidence
+// - alert owner and explicitly linked guardians may read it
+// - audio evidence is immutable from the client
 
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function alertOwnerId(alertId) {
+      return firestore.get(
+        /databases/(default)/documents/alerts/$(alertId)
+      ).data.userId;
+    }
+
+    function isAlertParticipant(alertId) {
+      return signedIn()
+        && (
+          alertOwnerId(alertId) == request.auth.uid
+          || firestore.exists(
+            /databases/(default)/documents/users/$(alertOwnerId(alertId))/guardians/$(request.auth.uid)
+          )
+        );
+    }
+
     match /emergency_audio/{alertId}/{filename} {
-      // Allow read if user is authenticated (app will restrict to alert participants via Firestore)
-      allow read: if request.auth != null;
-      // Allow create only for authenticated users (alert ownership checked in app / via custom claims if needed)
-      allow create: if request.auth != null
-        && request.resource.size < 50 * 1024 * 1024  // 50 MB max per file
+      allow read: if isAlertParticipant(alertId);
+
+      allow create: if signedIn()
+        && alertOwnerId(alertId) == request.auth.uid
+        && request.resource.size > 0
+        && request.resource.size < 50 * 1024 * 1024
         && request.resource.contentType.matches('audio/.*');
+
+      // SOS evidence must not be overwritten or erased by clients.
       allow update, delete: if false;
+    }
+
+    // Deny every other Storage path by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }
