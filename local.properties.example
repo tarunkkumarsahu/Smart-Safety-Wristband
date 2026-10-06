@@ -1,0 +1,9 @@
+# Copy this file to local.properties on your machine.
+# Never commit local.properties.
+
+# Android SDK path example (Windows):
+# sdk.dir=C:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
+sdk.dir=
+
+# Create a NEW restricted Gemini/Google API key after revoking any exposed key.
+GEMINI_API_KEY=REPLACE_WITH_LOCAL_SECRET
