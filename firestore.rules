@@ -1,79 +1,98 @@
-// Sakti Armor – Firestore Security Rules (draft)
-// Deploy: firebase deploy --only firestore:rules
-// 
-// Structure:
-//   users/{uid} – profile (role, name, bloodGroup, etc.)
-//   users/{uid}/guardians/{guardianId} – linked guardians
-//   alerts/{alertId} – alert doc (userId, status, lat, lng, etc.)
-//   alerts/{alertId}/locationHistory/{doc}
-//   alerts/{alertId}/messages/{doc}
+// Sakti Armor — Firestore Security Rules
+// Deploy with: firebase deploy --only firestore:rules
+//
+// Security model:
+// - users control only their own profile and guardian list
+// - alert owners create/update their own alert; owner id is immutable
+// - guardians are read-only participants
+// - SOS evidence/history cannot be overwritten or deleted by clients
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper: guardian can read alert if they are in the user's guardians list
-    function isGuardianOf(alertUserId) {
-      return exists(/databases/$(database)/documents/users/$(alertUserId)/guardians/$(request.auth.uid));
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // ---- Users: only own document ----
-    // User can read/write only their own profile.
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isGuardianOf(userId) {
+      return signedIn()
+        && exists(
+          /databases/$(database)/documents/users/$(userId)/guardians/$(request.auth.uid)
+        );
+    }
+
+    function alertOwnerId(alertId) {
+      return get(
+        /databases/$(database)/documents/alerts/$(alertId)
+      ).data.userId;
+    }
+
+    function isAlertParticipant(alertId) {
+      return signedIn()
+        && (
+          alertOwnerId(alertId) == request.auth.uid
+          || isGuardianOf(alertOwnerId(alertId))
+        );
+    }
+
+    // User profile: owner only.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, create, update, delete: if isOwner(userId);
     }
 
-    // ---- Guardians subcollection: only owner ----
-    // User can read/write their own guardians list.
+    // Guardian links: managed only by the protected user.
     match /users/{userId}/guardians/{guardianId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, create, update, delete: if isOwner(userId);
     }
 
-    // ---- Alerts: owner (user) can full access; guardians can read linked user's alerts ----
-    // Creator (userId on document) can read/write/update.
-    // Guardian access: would require checking if request.auth.uid is in users/{alertUserId}/guardians (server-side or via custom claims). For simplicity we allow read if authenticated; restrict in app or use Cloud Function for guardian checks.
+    // SOS alerts.
     match /alerts/{alertId} {
-      allow read: if request.auth != null
-        && (resource == null || resource.data.userId == request.auth.uid
-            || isGuardianOf(resource.data.userId));
-      allow create: if request.auth != null
+      allow read: if signedIn()
+        && (
+          resource.data.userId == request.auth.uid
+          || isGuardianOf(resource.data.userId)
+        );
+
+      allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null
-        && (resource.data.userId == request.auth.uid || isGuardianOf(resource.data.userId));
+
+      // Owner may update their alert, but ownership cannot be reassigned.
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId;
+
+      // Preserve SOS records from client-side erasure.
+      allow delete: if false;
     }
 
-    // ---- Audio clips (evidence during SOS) ----
+    // Audio metadata/evidence: owner creates, participants read, immutable afterwards.
     match /alerts/{alertId}/audioClips/{clipId} {
-      allow read: if request.auth != null
-        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
-            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
-      allow create: if request.auth != null
-        && get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid;
+      allow read: if isAlertParticipant(alertId);
+      allow create: if signedIn()
+        && alertOwnerId(alertId) == request.auth.uid;
       allow update, delete: if false;
     }
 
-    // ---- Location history: only alert owner or linked guardian ----
+    // Location history: owner appends, participants read, immutable afterwards.
     match /alerts/{alertId}/locationHistory/{docId} {
-      allow read: if request.auth != null
-        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
-            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
-      allow create: if request.auth != null
-        && get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid;
+      allow read: if isAlertParticipant(alertId);
+      allow create: if signedIn()
+        && alertOwnerId(alertId) == request.auth.uid;
       allow update, delete: if false;
     }
 
-    // ---- Messages: only participants (alert owner or guardian) ----
+    // Messages: participants may append and read; messages are immutable from clients.
     match /alerts/{alertId}/messages/{docId} {
-      allow read: if request.auth != null
-        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
-            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
-      allow create: if request.auth != null
-        && (get(/databases/$(database)/documents/alerts/$(alertId)).data.userId == request.auth.uid
-            || isGuardianOf(get(/databases/$(database)/documents/alerts/$(alertId)).data.userId));
+      allow read: if isAlertParticipant(alertId);
+      allow create: if isAlertParticipant(alertId);
       allow update, delete: if false;
     }
 
-    // Deny all other access
+    // Default deny.
     match /{document=**} {
       allow read, write: if false;
     }
